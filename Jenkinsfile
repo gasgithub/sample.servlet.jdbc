@@ -5,8 +5,8 @@ def serviceAccount = env.SERVICE_ACCOUNT ?: "default"
 
 // Pod Environment Variablesworkshop
 def namespace = env.NAMESPACE ?: "default"
-def registry = env.REGISTRY ?: "mycluster.icp:8500"
-def releaseName = env.RELEASE_NAME ?: "liberty-starter"
+def registry = env.REGISTRY ?: "10.110.123.2:8443"
+def releaseName = env.RELEASE_NAME ?: "JDBCApp"
 
 podTemplate(label: 'mypod', cloud: cloud, serviceAccount: serviceAccount, namespace: namespace, envVars: [
         envVar(key: 'NAMESPACE', value: namespace),
@@ -37,7 +37,7 @@ podTemplate(label: 'mypod', cloud: cloud, serviceAccount: serviceAccount, namesp
             stage('Build Docker Image') {
                 sh """
                 #!/bin/bash
-                docker build -t ${env.REGISTRY}/${env.NAMESPACE}/liberty-starter:${env.BUILD_NUMBER} .
+                docker build -t ${env.REGISTRY}/${env.NAMESPACE}/jdbc-wls:${env.BUILD_NUMBER} .
                 """
             }
             stage('Push Docker Image to Registry') {
@@ -47,7 +47,7 @@ podTemplate(label: 'mypod', cloud: cloud, serviceAccount: serviceAccount, namesp
                     sh """
                     #!/bin/bash
                     docker login -u ${USERNAME} -p ${PASSWORD} ${env.REGISTRY}
-                    docker push ${env.REGISTRY}/${env.NAMESPACE}/liberty-starter:${env.BUILD_NUMBER}
+                    docker push ${env.REGISTRY}/${env.NAMESPACE}/jdbc-wls:${env.BUILD_NUMBER}
                     """
                 }
             }
@@ -56,7 +56,7 @@ podTemplate(label: 'mypod', cloud: cloud, serviceAccount: serviceAccount, namesp
             stage('Deploy new Docker Image') {
                 sh """
                 #!/bin/bash
-                DEPLOYMENT=`kubectl --namespace=${env.NAMESPACE} get deployments -l app=liberty-starter,component=web-app,release=${env.RELEASE_NAME} -o name`
+                DEPLOYMENT=`kubectl --namespace=${env.NAMESPACE} get deployments -l app=jdbc-wls,component=web-app,release=${env.RELEASE_NAME} -o name`
                 kubectl --namespace=${env.NAMESPACE} get \${DEPLOYMENT}
                 if [ \${?} -ne "0" ]; then
                     # No deployment to update
@@ -64,7 +64,7 @@ podTemplate(label: 'mypod', cloud: cloud, serviceAccount: serviceAccount, namesp
                     exit 1
                 fi
                 # Update Deployment
-                kubectl --namespace=${env.NAMESPACE} set image \${DEPLOYMENT} ${env.RELEASE_NAME}-web=${env.REGISTRY}/${env.NAMESPACE}/liberty-starter:${env.BUILD_NUMBER}
+                kubectl --namespace=${env.NAMESPACE} set image \${DEPLOYMENT} ${env.RELEASE_NAME}-web=${env.REGISTRY}/${env.NAMESPACE}/jdbc-wls:${env.BUILD_NUMBER}
                 kubectl --namespace=${env.NAMESPACE} rollout status \${DEPLOYMENT}
                 """
             }
