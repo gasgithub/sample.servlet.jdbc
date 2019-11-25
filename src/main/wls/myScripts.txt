@@ -1,0 +1,257 @@
+[oracle@c5708b4c1b7f base_domain]$ cat Script1574333864608.py
+
+startEdit()
+
+cd('/')
+cmo.createFileStore('FileStore-0')
+
+cd('/FileStores/FileStore-0')
+cmo.setDirectory('/u01/oracle/user_projects/domains/base_domain/FileStore')
+set('Targets',jarray.array([ObjectName('com.bea:Name=AdminServer,Type=Server')], ObjectName))
+
+activate()
+
+startEdit()
+
+[oracle@c5708b4c1b7f base_domain]$ cat Script1574335452890.py
+
+cd('/')
+cmo.createJMSServer('JMSServer-0')
+
+cd('/JMSServers/JMSServer-0')
+cmo.setPersistentStore(getMBean('/FileStores/FileStore-0'))
+set('Targets',jarray.array([ObjectName('com.bea:Name=AdminServer,Type=Server')], ObjectName))
+
+activate()
+
+[oracle@c5708b4c1b7f base_domain]$ cat Script1574335652439.py
+
+cd('/')
+cmo.createJMSSystemResource('SystemModule-0')
+
+cd('/JMSSystemResources/SystemModule-0')
+set('Targets',jarray.array([ObjectName('com.bea:Name=AdminServer,Type=Server')], ObjectName))
+
+activate()
+cmo.createSubDeployment('Queue-0')
+
+cd('/JMSSystemResources/SystemModule-0/JMSResource/SystemModule-0')
+cmo.createQueue('Queue-0')
+
+cd('/JMSSystemResources/SystemModule-0/JMSResource/SystemModule-0/Queues/Queue-0')
+cmo.setJNDIName('jms/queue')
+cmo.setSubDeploymentName('Queue-0')
+
+cd('/JMSSystemResources/SystemModule-0/SubDeployments/Queue-0')
+set('Targets',jarray.array([ObjectName('com.bea:Name=JMSServer-0,Type=JMSServer')], ObjectName))
+
+activate()
+
+cd('/JMSSystemResources/SystemModule-0/JMSResource/SystemModule-0')
+cmo.createConnectionFactory('ConnectionFactory-0')
+
+cd('/JMSSystemResources/SystemModule-0/JMSResource/SystemModule-0/ConnectionFactories/ConnectionFactory-0')
+cmo.setJNDIName('jms/qcf')
+
+cd('/JMSSystemResources/SystemModule-0/JMSResource/SystemModule-0/ConnectionFactories/ConnectionFactory-0/SecurityParams/ConnectionFactory-0')
+cmo.setAttachJMSXUserId(false)
+
+cd('/JMSSystemResources/SystemModule-0/JMSResource/SystemModule-0/ConnectionFactories/ConnectionFactory-0/ClientParams/ConnectionFactory-0')
+cmo.setClientIdPolicy('Restricted')
+cmo.setSubscriptionSharingPolicy('Exclusive')
+cmo.setMessagesMaximum(10)
+
+cd('/JMSSystemResources/SystemModule-0/JMSResource/SystemModule-0/ConnectionFactories/ConnectionFactory-0/TransactionParams/ConnectionFactory-0')
+cmo.setXAConnectionFactoryEnabled(true)
+
+cd('/JMSSystemResources/SystemModule-0/JMSResource/SystemModule-0/ConnectionFactories/ConnectionFactory-0')
+cmo.setDefaultTargetingEnabled(true)
+
+activate()
+
+
+
+SSL
+[oracle@c5708b4c1b7f base_domain]$ cat Script1574334542270.py
+
+cd('/Servers/AdminServer/SSL/AdminServer')
+cmo.setExportKeyLifespan(500)
+cmo.setUseServerCerts(false)
+cmo.setSSLRejectionLoggingEnabled(true)
+cmo.setAllowUnencryptedNullCipher(false)
+cmo.setInboundCertificateValidation('BuiltinSSLValidationOnly')
+cmo.setOutboundCertificateValidation('BuiltinSSLValidationOnly')
+cmo.setHostnameVerificationIgnored(true)
+cmo.setHostnameVerifier(None)
+cmo.setTwoWaySSLEnabled(false)
+cmo.setClientCertificateEnforced(false)
+
+activate()
+
+startEdit()
+
+
+
+JDBC
+[oracle@c5708b4c1b7f base_domain]$ cat Script1574334886927.py
+
+cd('/')
+cmo.createJDBCSystemResource('JDBC Data Source-0')
+
+cd('/JDBCSystemResources/JDBC Data Source-0/JDBCResource/JDBC Data Source-0')
+cmo.setName('JDBC Data Source-0')
+
+cd('/JDBCSystemResources/JDBC Data Source-0/JDBCResource/JDBC Data Source-0/JDBCDataSourceParams/JDBC Data Source-0')
+set('JNDINames',jarray.array([String('jdbc/exampleDS')], String))
+
+cd('/JDBCSystemResources/JDBC Data Source-0/JDBCResource/JDBC Data Source-0')
+cmo.setDatasourceType('GENERIC')
+
+cd('/JDBCSystemResources/JDBC Data Source-0/JDBCResource/JDBC Data Source-0/JDBCDriverParams/JDBC Data Source-0')
+cmo.setUrl('jdbc:oracle:thin:@dbhost:1521:myDB')
+cmo.setDriverName('oracle.jdbc.OracleDriver')
+setEncrypted('Password', 'Password_1574335137782', '/u01/oracle/user_projects/domains/base_domain/Script1574334886927Config', '/u01/oracle/user_projects/domains/base_domain/Script1
+574334886927Secret')
+
+cd('/JDBCSystemResources/JDBC Data Source-0/JDBCResource/JDBC Data Source-0/JDBCConnectionPoolParams/JDBC Data Source-0')
+cmo.setTestTableName('SQL ISVALID\r\n')
+
+cd('/JDBCSystemResources/JDBC Data Source-0/JDBCResource/JDBC Data Source-0/JDBCDriverParams/JDBC Data Source-0/Properties/JDBC Data Source-0')
+cmo.createProperty('user')
+
+cd('/JDBCSystemResources/JDBC Data Source-0/JDBCResource/JDBC Data Source-0/JDBCDriverParams/JDBC Data Source-0/Properties/JDBC Data Source-0/Properties/user')
+cmo.setValue('orcl')
+
+cd('/JDBCSystemResources/JDBC Data Source-0/JDBCResource/JDBC Data Source-0/JDBCDataSourceParams/JDBC Data Source-0')
+cmo.setGlobalTransactionsProtocol('OnePhaseCommit')
+
+cd('/JDBCSystemResources/JDBC Data Source-0')
+set('Targets',jarray.array([ObjectName('com.bea:Name=AdminServer,Type=Server')], ObjectName))
+
+activate()
+
+
+DERBY
+=========================
+[oracle@c5708b4c1b7f base_domain]$ cat Script1574351847164.py
+
+startEdit()
+
+cd('/')
+cmo.createJDBCSystemResource('JDBC Data Source-1')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1')
+cmo.setName('JDBC Data Source-1')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1/JDBCDataSourceParams/JDBC Data Source-1')
+set('JNDINames',jarray.array([String('jdbc/exampleDS2')], String))
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1')
+cmo.setDatasourceType('GENERIC')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1/JDBCDriverParams/JDBC Data Source-1')
+cmo.setUrl('jdbc:derby:memory:demoDB')
+cmo.setDriverName('org.apache.derby.jdbc.EmbeddedDriver')
+setEncrypted('Password', 'Password_1574351919657', '/u01/oracle/user_projects/domains/base_domain/Script1574351847164Config', '/u01/oracle/user_projects/domains/base_domain/Script1
+574351847164Secret')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1/JDBCConnectionPoolParams/JDBC Data Source-1')
+cmo.setTestTableName('SQL SELECT 1 FROM SYS.SYSTABLES\r\n')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1/JDBCDriverParams/JDBC Data Source-1/Properties/JDBC Data Source-1')
+cmo.createProperty('user')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1/JDBCDriverParams/JDBC Data Source-1/Properties/JDBC Data Source-1/Properties/user')
+cmo.setValue('wlsadmin')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1/JDBCDriverParams/JDBC Data Source-1/Properties/JDBC Data Source-1')
+cmo.createProperty('create')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1/JDBCDriverParams/JDBC Data Source-1/Properties/JDBC Data Source-1/Properties/create')
+cmo.setValue('true')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1/JDBCDriverParams/JDBC Data Source-1/Properties/JDBC Data Source-1')
+cmo.createProperty('databaseName')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1/JDBCDriverParams/JDBC Data Source-1/Properties/JDBC Data Source-1/Properties/databaseName')
+cmo.setValue('demoDB')
+
+cd('/JDBCSystemResources/JDBC Data Source-1/JDBCResource/JDBC Data Source-1/JDBCDataSourceParams/JDBC Data Source-1')
+cmo.setGlobalTransactionsProtocol('OnePhaseCommit')
+
+cd('/JDBCSystemResources/JDBC Data Source-1')
+set('Targets',jarray.array([ObjectName('com.bea:Name=AdminServer,Type=Server')], ObjectName))
+
+activate()
+
+startEdit()
+
+
+
+
+================================================
+LDAP security
+cd('/SecurityConfiguration/base_domain/Realms/myrealm/AuthenticationProviders/DefaultAuthenticator')
+cmo.setControlFlag('SUFFICIENT')
+
+[oracle@03969acb8d40 base_domain]$ cat Script1574456081741.py
+
+cd('/SecurityConfiguration/base_domain/Realms/myrealm')
+cmo.createAuthenticationProvider('LDAP-AD', 'weblogic.security.providers.authentication.ActiveDirectoryAuthenticator')
+
+cd('/SecurityConfiguration/base_domain/Realms/myrealm/AuthenticationProviders/LDAP-AD')
+cmo.setControlFlag('OPTIONAL')
+
+activate()
+
+startEdit()
+cmo.setControlFlag('SUFFICIENT')
+
+activate()
+
+startEdit()
+cmo.setGroupBaseDN('CN=Users,DC=ad,DC=gas,DC=pl')
+cmo.setAllUsersFilter(' \t(&(cn=*)(objectclass=person))')
+cmo.setUserBaseDN('CN=Users,DC=ad,DC=gas,DC=pl')
+setEncrypted('Credential', 'Credential_1574456547149', '/u01/oracle/user_projects/domains/base_domain/Script1574456081741Config', '/u01/oracle/user_projects/domains/base_domain/Scr
+ipt1574456081741Secret')
+cmo.setHost('192.168.75.147')
+cmo.setAllGroupsFilter(' \t(&(cn=*)(|(objectclass=group)))')
+cmo.setPrincipal('CN=wlsbind,CN=Users,DC=ad,DC=gas,DC=pl')
+
+activate()
+
+startEdit()
+
+cd('/SecurityConfiguration/base_domain/Realms/myrealm')
+set('AuthenticationProviders',jarray.array([ObjectName('Security:Name=myrealmLDAP-AD'), ObjectName('Security:Name=myrealmDefaultAuthenticator'), ObjectName('Security:Name=myrealmDe
+faultIdentityAsserter')], ObjectName))
+
+activate()
+
+startEdit()
+[oracle@03969acb8d40 base_domain]$
+
+[oracle@03969acb8d40 base_domain]$ cat Script1574468773177.py
+
+startEdit()
+# A security change to a role, policy, user, group or credential mapping was made, but this change was not recorded.
+
+
+authenticatorPath= '/SecurityConfiguration/' + domainName + '/Realms/' + realmName + '/AuthenticationProviders/DefaultAuthenticator'
+print authenticatorPath
+cd(authenticatorPath)
+
+sr = cmo.getSecurityConfiguration().getDefaultRealm();
+rm = sr.lookupRoleMapper('XACMLRoleMapper');
+expr = rm.getRoleExpression(None,'Admin');
+# important to see what expression is used
+print expr;
+ 
+# some setting the role examples
+rm.setRoleExpression(None,'Admin',expr+'|Usr(employee)');
+rm.setRoleExpression(None,'Anonymous','Usr(employee)|Grp(everyone)');
+rm.setRoleExpression(None,'Anonymous','Usr(employee)&amp;Grp(everyone)');
+rm.setRoleExpression(None,'Admin','Usr(employee)|Grp(Administrators)');
+rm.setRoleExpression(None,'Admin','Grp(Deployers)|Grp(Administrators)');
+

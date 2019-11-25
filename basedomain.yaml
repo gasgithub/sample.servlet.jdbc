@@ -1,0 +1,110 @@
+domainInfo:
+    AdminUserName: '@@FILE:/u01/oracle/properties/adminuser.properties@@'
+    AdminPassword: '@@FILE:/u01/oracle/properties/adminpass.properties@@'
+topology:
+    Name: base_domain
+    AdministrationPortEnabled: true
+    NMProperties:
+        JavaHome: /usr/java/jdk1.8.0_211
+        LogFile: '@@DOMAIN_HOME@@/nodemanager/nodemanager.log'
+        DomainsFile: '@@DOMAIN_HOME@@/nodemanager/nodemanager.domains'
+        NodeManagerHome: '@@DOMAIN_HOME@@/nodemanager'
+        weblogic.StartScriptName: startWebLogic.sh
+    Server:
+        AdminServer:
+            SSL:
+                Enabled: true
+    SecurityConfiguration:
+        NodeManagerPasswordEncrypted: wlsadmin123
+        NodeManagerUsername: wlsadmin
+        CredentialEncrypted: wlsadmin123
+        Realm:
+            myrealm:
+                Adjudicator:
+                    DefaultAdjudicator:
+                        DefaultAdjudicator:
+                AuthenticationProvider:
+                    'LDAP-AD':
+                        ActiveDirectoryAuthenticator:
+                            Principal: wlsbind
+                            AllGroupsFilter: '(&(cn=*)(|(objectclass=group)))'
+                            GroupBaseDN: 'CN=Users,DC=ad,DC=gas,DC=pl'
+                            CredentialEncrypted: wlsbind
+                            UserBaseDn: 'CN=Users,DC=ad,DC=gas,DC=pl'
+                            AllUsersFilter: '(&(cn=*)(objectclass=person))'
+                            ControlFlag: SUFFICIENT
+                            Host: 192.168.75.147
+                    DefaultAuthenticator:
+                        DefaultAuthenticator:
+                            ControlFlag: SUFFICIENT
+                    DefaultIdentityAsserter:
+                        DefaultIdentityAsserter:
+                            ActiveType: [ AuthenticatedUser, 'weblogic-jwt-token' ]
+                Authorizer:
+                    XACMLAuthorizer:
+                        XACMLAuthorizer:
+                            PolicyDeploymentEnabled: true
+                CertPathProvider:
+                    WebLogicCertPathProvider:
+                        WebLogicCertPathProvider:
+                CredentialMapper:
+                    DefaultCredentialMapper:
+                        DefaultCredentialMapper:
+                PasswordValidator:
+                    SystemPasswordValidator:
+                        SystemPasswordValidator:
+                RoleMapper:
+                    XACMLRoleMapper:
+                        XACMLRoleMapper:
+resources:
+    JDBCSystemResource:
+        DockerDS:
+            Target: AdminServer
+            DescriptorFileName: 'jdbc/DockerDS-2607-jdbc.xml'
+            JdbcResource:
+                JDBCConnectionPoolParams:
+                    TestTableName: SQL SELECT 1 FROM DUAL
+                JDBCDataSourceParams:
+                    GlobalTransactionsProtocol: OnePhaseCommit
+                    JNDIName: jdbc/exampleDS
+                JDBCDriverParams:
+                    URL: 'jdbc:derby:memory:demoDB;create=true'
+                    PasswordEncrypted: wlsadmin
+                    DriverName: org.apache.derby.jdbc.EmbeddedDriver
+                    Properties:
+                        user:
+                            Value: wlsadmin
+                        databaseName:
+                            Value: 'demoDB;create=true'
+    FileStore:
+        DockerFileStore:
+            Directory: wlsdeploy/stores/DockerFileStore/
+            Target: AdminServer
+    JMSServer:
+        DockerJMSServer:
+            PersistentStore: DockerFileStore
+            Target: AdminServer
+    JMSSystemResource:
+        DockerJMSSystemResource:
+            Target: AdminServer
+            DescriptorFileName: 'jms/DockerJMSSystemResource-8989-jms.xml'
+            SubDeployment:
+                DockerQueueSubDeployment:
+                    Target: DockerJMSServer
+            JmsResource:
+                ConnectionFactory:
+                    DockerConnectionFactory:
+                        JNDIName: jms/qcf
+                        DefaultTargetingEnabled: true
+                        TransactionParams:
+                            XAConnectionFactoryEnabled: true
+                Queue:
+                    DockerQueue:
+                        SubDeploymentName: DockerQueueSubDeployment
+                        JNDIName: jms/queue
+appDeployments:
+    Application:
+        JDBCApp:
+            SourcePath: 'wlsdeploy/applications/JDBCApp.war'
+            StagingMode: nostage
+            Target: AdminServer

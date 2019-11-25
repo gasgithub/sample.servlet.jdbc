@@ -1,0 +1,10 @@
+dsname=DockerDS2
+dsdbname=InfraDB
+dsjndiname=jdbc/AuctionDB
+dsdriver=oracle.jdbc.xa.client.OracleXADataSource
+dsurl=jdbc:oracle:thin:@//InfraDB:1521/ORCLCDB
+dsusername=system
+dspassword=MYDBPasswd
+dstestquery=SELECT * FROM DUAL
+cp_initial_capacity=0
+target_type=Server

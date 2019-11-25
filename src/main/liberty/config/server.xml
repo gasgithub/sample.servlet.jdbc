@@ -15,20 +15,21 @@
 
     <featureManager>
         <feature>servlet-3.1</feature>
-    </featureManager>
-    <featureManager>
     	<feature>jdbc-4.1</feature>
-    </featureManager>
+    	<feature>jsp-2.3</feature>
+		<feature>wasJmsServer-1.0</feature>
+		<feature>jms-2.0</feature>
+		<feature>wasJmsClient-2.0</feature>
+		<feature>appSecurity-2.0</feature>
+	</featureManager>
 
 	<jdbcDriver id="DerbyEmbedded" libraryRef="DerbyLib"/>
 
 	<library id="DerbyLib">
-  	  <!-- fileset dir="C:/Derby/db-derby-10.13.1.1-bin/lib" includes="derby.jar"/-->
   	  <fileset dir="${shared.resource.dir}" includes="derby-10.13.1.1.jar"/>
 	</library>
 
 	<dataSource id="ds1" jndiName="jdbc/exampleDS" jdbcDriverRef="DerbyEmbedded">
-	<!-- databaseName="C:/Derby/db-derby-10.13.1.1-bin/data/exampleDB"-->
   	  <properties.derby.embedded
    	  databaseName="${server.output.dir}/derbyDB" 	 
    	  createDatabase="create"
@@ -41,6 +42,26 @@
     
     </httpEndpoint>
     
-    <application name="servlet" context-root="${appContext}" location="${appLocation}" type="war"></application>
-    
+    <application name="servlet" context-root="${appContext}"
+    	location="${appLocation}" type="war">
+    	<application-bnd>
+    		<security-role name="allUsers">
+    			<special-subject type="ALL_AUTHENTICATED_USERS"></special-subject>
+    		</security-role>
+    	</application-bnd>
+    </application>
+
+    <messagingEngine>
+    	<queue id="QUEUE1"></queue>
+    </messagingEngine>
+    <jmsQueueConnectionFactory jndiName="jms/qcf">
+    	<properties.wasJms></properties.wasJms>
+    </jmsQueueConnectionFactory>
+    <jmsQueue jndiName="jms/queue">
+    	<properties.wasJms queueName="QUEUE1"></properties.wasJms>
+    </jmsQueue>
+    <logging consoleLogLevel="INFO"></logging>
+    <basicRegistry>
+    	<user password="jank" name="jank"></user>
+    </basicRegistry>
 </server>
