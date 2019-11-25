@@ -194,18 +194,18 @@ assign('AppDeployment', appname, 'Target', admin_name)
 
 # LDAP security
 # ===================
-cd('/SecurityConfiguration/base_domain/Realms/myrealm/AuthenticationProviders/DefaultAuthenticator')
-cmo.setControlFlag('SUFFICIENT')
+# cd('/SecurityConfiguration/base_domain/Realms/myrealm/AuthenticationProviders/DefaultAuthenticator')
+# cmo.setControlFlag('SUFFICIENT')
 
-cd('/SecurityConfiguration/base_domain/Realms/myrealm')
+# cd('/SecurityConfiguration/base_domain/Realms/myrealm')
 #prov = create('LDAP-AD', 'weblogic.security.providers.authentication.ActiveDirectoryAuthenticator')
 #print 'prov: ' + prov 
 #cd('/SecurityConfiguration/base_domain/Realms/myrealm/AuthenticationProviders/LDAP-AD')
-cmo.createAuthenticationProvider('LDAP-AD', 'weblogic.security.providers.authentication.ActiveDirectoryAuthenticator')
-ls()
-cd('/SecurityConfiguration/base_domain/Realms/myrealm/AuthenticationProviders')
-ls()
-
+# cmo.createAuthenticationProvider('LDAP-AD', 'weblogic.security.providers.authentication.ActiveDirectoryAuthenticator')
+#ls()
+# cd('/SecurityConfiguration/base_domain/Realms/myrealm/AuthenticationProviders')
+#ls()
+ 
 #cmo.setControlFlag('SUFFICIENT')
 #cmo.setGroupBaseDN('CN=Users,DC=ad,DC=gas,DC=pl')
 #cmo.setAllUsersFilter('(&(cn=*)(objectclass=person))')
