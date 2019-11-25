@@ -5,7 +5,7 @@ def serviceAccount = env.SERVICE_ACCOUNT ?: "default"
 
 // Pod Environment Variablesworkshop
 def namespace = env.NAMESPACE ?: "default"
-def registry = env.REGISTRY ?: "10.110.123.2:8443"
+def registry = env.REGISTRY ?: "10.110.123.2:8500"
 def releaseName = env.RELEASE_NAME ?: "JDBCApp"
 
 podTemplate(label: 'mypod', cloud: cloud, serviceAccount: serviceAccount, namespace: namespace, envVars: [
